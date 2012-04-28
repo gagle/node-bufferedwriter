@@ -5,7 +5,7 @@
  * @author Gabriel Llamas
  * @created 27/04/2012
  * @modified 28/04/2012
- * @version 0.0.1
+ * @version 0.1.0
  */
 "use strict";
 
@@ -18,6 +18,8 @@ var EOL = process.platform.indexOf ("win") !== -1 ? new Buffer ([0x0D, 0x0A]) : 
 var INVALID_BUFFER_SIZE = new Error ("The buffer size must be greater than 0.");
 
 var BufferedWriter = function (fileName, bufferSize, encoding, append){
+	EVENTS.EventEmitter.call (this);
+	
 	var argsLen = arguments.length;
 	var type;
 	if (argsLen === 1){
@@ -61,8 +63,17 @@ var BufferedWriter = function (fileName, bufferSize, encoding, append){
 	};
 	
 	this._fileName = fileName;
-	this._fd = null;
+	this._stream = null;
 	this._buffer = null;
+	this._bufferOffset = 0;
+};
+
+BufferedWriter.prototype = Object.create (EVENTS.EventEmitter.prototype);
+BufferedWriter.prototype.constructor = BufferedWriter;
+
+BufferedWriter.prototype._flush = function (){
+	this._stream.write (this._bufferOffset !== this._settings._bufferSize ?
+		this._buffer.slice (0, this._bufferOffset) : this._buffer);
 	this._bufferOffset = 0;
 };
 
@@ -73,97 +84,47 @@ BufferedWriter.prototype._getAvailableSpace = function (n){
 	return n;
 };
 
-BufferedWriter.prototype._open = function (cb){
-	if (this._fd) return cb (null, this._fd);
-	
+BufferedWriter.prototype._write = function (data, offset, length){
 	var me = this;
-	FS.open (this._fileName, this._settings.append, function (error, fd){
-		if (error) return cb (error, null);
-		
-		me._fd = fd;
-		me._buffer = new Buffer (me._settings.bufferSize);
-		cb (null, me._fd);
-	});
-};
-
-BufferedWriter.prototype._write = function (data, offset, length, cb){
-	var me = this;
-	this._open (function (error, fd){
-		if (error){
-			if (cb) cb (error);
-			return;
-		}
-		
-		var bytes = me._getAvailableSpace (length);
-		data.copy (me._buffer, me._bufferOffset, offset, offset + bytes);
-		me._bufferOffset += bytes;
-		offset += bytes;
-		length -= bytes;
-		if (me._bufferOffset === me._settings.bufferSize){
-			me.flush (function (error){
-				if (error){
-					if (cb) cb (error);
-				}else if (length !== 0){
-					me._write (data, offset, length, cb);
-				}
-			});
-		}else{
-			if (cb) cb (null);
-		}
-	});
-};
-
-BufferedWriter.prototype.close = function (cb){
-	if (cb) cb = cb.bind (this);
-	if (!this._fd){
-		if (cb) cb (null);
-		return;
+	if (!this._stream){
+		this._buffer = new Buffer (this._settings.bufferSize);
+		this._stream = FS.createWriteStream (this._fileName, {
+			flags: me._settings.append,
+			encoding: me._settings.encoding
+		});
+		this._stream.on ("error", function (error){
+			me.emit (error);
+		});
 	}
 	
-	var close = function (){
-		FS.close (me._fd, function (error){
-			me._fd = null;
-			me._buffer = null;
-			if (cb) cb (error);
-		});
-	};
-	
-	var me = this;
+	var bytes = this._getAvailableSpace (length);
+	data.copy (this._buffer, this._bufferOffset, offset, offset + bytes);
+	this._bufferOffset += bytes;
+	offset += bytes;
+	length -= bytes;
+	if (this._bufferOffset === this._settings.bufferSize){
+		this._flush ();
+		if (length !== 0){
+			this._write (data, offset, length);
+		}
+	}
+};
+
+BufferedWriter.prototype.close = function (){
+	if (!this._stream) return;
+
 	if (this._bufferOffset !== 0){
-		this.flush (function (error){
-			if (error){
-				if (cb) cb (error);
-			}else{
-				close ();
-			}
-		});
-	}else{
-		close ();
+		this._flush ();
 	}
+	
+	this._stream.end ();
+	this._stream = null;
+	this._buffer = null;
 };
 
-BufferedWriter.prototype.flush = function (cb){
-	if (cb) cb = cb.bind (this);
-	if (!this._fd){
-		if (cb) cb (null);
-		return;
-	}
-	var me = this;
-	FS.write (this._fd, this._buffer, 0, this._bufferOffset, null, function (error){
-		if (error){
-			if (cb) cb (error);
-		}else{
-			me._bufferOffset = 0;
-			if (cb) cb (null);
-		}
-	});
-};
-
-BufferedWriter.prototype.newLine = function (cb){
-	if (cb) cb = cb.bind (this);
-	this._write (EOL, 0, EOL.length, function (error){
-		if (cb) cb (error);
-	});
+BufferedWriter.prototype.newLine = function (){
+	this._write (EOL, 0, EOL.length);
+	return this;
 };
 
 var fixBufferType = function (bw, buffer){
@@ -176,9 +137,8 @@ var fixBufferType = function (bw, buffer){
 	return new Buffer ([buffer]);
 };
 
-BufferedWriter.prototype.write = function (buffer, offset, length, cb){
+BufferedWriter.prototype.write = function (buffer, offset, length){
 	if (typeof buffer === "string"){
-		cb = offset;
 		offset = 0;
 		length = buffer.length;
 		buffer = new Buffer (buffer, this._settings.encoding)
@@ -189,17 +149,13 @@ BufferedWriter.prototype.write = function (buffer, offset, length, cb){
 			offset = 0;
 			length = 1;
 		}else if (argsLen === 2){
-			cb = offset;
 			offset = 0;
 			length = 1;
 		}
 	}
 	
-	if (cb) cb = cb.bind (this);
-	
-	this._write (buffer, offset, length, function (error){
-		if (cb) cb (error);
-	});
+	this._write (buffer, offset, length);
+	return this;
 };
 
 module.exports = BufferedWriter;
