@@ -29,7 +29,7 @@ Or simply copying `build/buffered-writer.js` into your project's directory and `
 <a name="compatibility"></a>
 #### Compatibility [↑](#start) ####
 
-✔ Node *
+✔ Node 0.4.10+
 
 ***
 
