@@ -5,7 +5,7 @@
  * @author Gabriel Llamas
  * @created 27/04/2012
  * @modified 28/04/2012
- * @version 0.1.0
+ * @version 0.1.1
  */
 "use strict";
 
@@ -128,27 +128,33 @@ BufferedWriter.prototype.newLine = function (){
 };
 
 var fixBufferType = function (bw, buffer){
+	
+	
+	if (buffer instanceof Buffer) return buffer;
+
+	return ;
+};
+
+BufferedWriter.prototype.write = function (buffer, offset, length){
 	var isArray = function (array){
 		return Object.prototype.toString.call (array) === "[object Array]";
 	};
 	
-	if (buffer instanceof Buffer) return buffer;
-	if (isArray (buffer)) return new Buffer (buffer);
-	return new Buffer ([buffer]);
-};
-
-BufferedWriter.prototype.write = function (buffer, offset, length){
-	if (typeof buffer === "string"){
+	var type = typeof buffer;
+	if (type === "number"){
+		offset = 0;
+		length = 1;
+		buffer = new Buffer ([buffer]);
+	}else if (type === "string"){
 		offset = 0;
 		length = buffer.length;
-		buffer = new Buffer (buffer, this._settings.encoding)
+		buffer = new Buffer (buffer, this._settings.encoding);
 	}else{
-		buffer = fixBufferType (this, buffer);
+		if (isArray (buffer)){
+			buffer = new Buffer (buffer);
+		}
 		var argsLen = arguments.length;
 		if (argsLen === 1){
-			offset = 0;
-			length = 1;
-		}else if (argsLen === 2){
 			offset = 0;
 			length = 1;
 		}
