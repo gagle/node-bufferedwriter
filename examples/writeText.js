@@ -20,11 +20,29 @@ new BufferedWriter ("file", "utf8")
 			this.close (function (error){
 				if (error) console.log (error);
 				
-				//The file contains:
-				/*
-					First line
-					Second line
-				*/
+				//The BufferedWriter appends content to the end of the file because append == true
+				//From the end of the file:
+				//Writes EOL (OS dependent; \r\n on Windows, otherwise \n)
+				new BufferedWriter ("file", "utf8", true).newLine (function (error){
+					if (error) console.log (error);
+					
+					//Writes "Third line"
+					this.write ("Third line", function (error){
+						if (error) console.log (error);
+						
+						//Closes the writer. A flush is implicitly done.
+						this.close (function (error){
+							if (error) console.log (error);
+							
+							//The file contains:
+							/*
+								First line
+								Second line
+								Third line
+							*/
+						});
+					});
+				});
 			});
 		});
 	});
