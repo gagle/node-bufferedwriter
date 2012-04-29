@@ -4,8 +4,8 @@
  *
  * @author Gabriel Llamas
  * @created 27/04/2012
- * @modified 28/04/2012
- * @version 0.1.1
+ * @modified 29/04/2012
+ * @version 0.1.2
  */
 "use strict";
 
@@ -127,24 +127,27 @@ BufferedWriter.prototype.newLine = function (){
 	return this;
 };
 
-var fixBufferType = function (bw, buffer){
-	
-	
-	if (buffer instanceof Buffer) return buffer;
+var isArray = function (array){
+	return Object.prototype.toString.call (array) === "[object Array]";
+};
 
-	return ;
+var toHexArray = function (n){
+	if (n === 0) return [0x00];
+	var array = [];
+	while (n){
+		array.push (0xFF & n);
+		n = n >>> 8;
+	}
+	return array.reverse ();
 };
 
 BufferedWriter.prototype.write = function (buffer, offset, length){
-	var isArray = function (array){
-		return Object.prototype.toString.call (array) === "[object Array]";
-	};
-	
 	var type = typeof buffer;
 	if (type === "number"){
 		offset = 0;
-		length = 1;
-		buffer = new Buffer ([buffer]);
+		buffer = toHexArray (buffer);
+		length = buffer.length;
+		buffer = new Buffer (buffer);
 	}else if (type === "string"){
 		offset = 0;
 		length = buffer.length;
