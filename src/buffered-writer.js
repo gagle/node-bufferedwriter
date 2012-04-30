@@ -4,8 +4,8 @@
  *
  * @author Gabriel Llamas
  * @created 27/04/2012
- * @modified 29/04/2012
- * @version 0.1.2
+ * @modified 30/04/2012
+ * @version 0.1.3
  */
 "use strict";
 
@@ -135,10 +135,10 @@ var toHexArray = function (n){
 	if (n === 0) return [0x00];
 	var array = [];
 	while (n){
-		array.push (0xFF & n);
+		array.unshift (0xFF & n);
 		n = n >>> 8;
 	}
-	return array.reverse ();
+	return array;
 };
 
 BufferedWriter.prototype.write = function (buffer, offset, length){
