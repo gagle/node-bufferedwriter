@@ -132,12 +132,11 @@ var isArray = function (array){
 };
 
 var toHexArray = function (n){
-	if (n === 0) return [0x00];
 	var array = [];
-	while (n){
-		array.unshift (0xFF & n);
+	do{
+		array.unshift (n & 0xFF);
 		n = n >>> 8;
-	}
+	}while (n);
 	return array;
 };
 
