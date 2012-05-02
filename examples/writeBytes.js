@@ -13,7 +13,7 @@ new BufferedWriter ("file")
 	.close (); //Closes the writer. A flush is implicitly done.
 
 //The BufferedWriter appends content to the end of the file because append == true
-new BufferedWriter ("file", true)
+new BufferedWriter ("file", { append: true })
 	.on ("error", function (error){
 		console.log (error);
 	})

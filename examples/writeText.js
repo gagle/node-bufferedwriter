@@ -1,7 +1,7 @@
 var BufferedWriter = require ("../build/buffered-writer");
 
 //The BufferedWriter truncates the file because append == false
-new BufferedWriter ("file", "utf8")
+new BufferedWriter ("file", { encoding: "utf8" })
 	.on ("error", function (error){
 		console.log (error);
 	})
@@ -13,7 +13,7 @@ new BufferedWriter ("file", "utf8")
 	.close (); //Closes the writer. A flush is implicitly done.
 
 //The BufferedWriter appends content to the end of the file because append == true
-new BufferedWriter ("file", "utf8", true)
+new BufferedWriter ("file", { encoding: "utf8", append: true })
 	.on ("error", function (error){
 		console.log (error);
 	})

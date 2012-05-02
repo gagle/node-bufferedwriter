@@ -4,8 +4,8 @@
  *
  * @author Gabriel Llamas
  * @created 27/04/2012
- * @modified 30/04/2012
- * @version 0.1.3
+ * @modified 02/05/2012
+ * @version 0.1.4
  */
 "use strict";
 
@@ -17,50 +17,19 @@ var EOL = process.platform.indexOf ("win") !== -1 ? new Buffer ([0x0D, 0x0A]) : 
 
 var INVALID_BUFFER_SIZE = new Error ("The buffer size must be greater than 0.");
 
-var BufferedWriter = function (fileName, bufferSize, encoding, append){
+var BufferedWriter = function (fileName, settings){
 	EVENTS.EventEmitter.call (this);
 	
-	var argsLen = arguments.length;
-	var type;
-	if (argsLen === 1){
-		bufferSize = BUFFER_SIZE;
-		encoding = null;
-		append = false;
-	}else if (argsLen === 2){
-		type = typeof bufferSize;
-		if (type === "string"){
-			encoding = bufferSize;
-			bufferSize = BUFFER_SIZE;
-			append = false;
-		}else if (type === "boolean"){
-			append = bufferSize;
-			bufferSize = BUFFER_SIZE;
-			encoding = null;
-		}else{
-			encoding = null;
-			append = false;
-		}
-	}else if (argsLen === 3){
-		type = typeof bufferSize;
-		if (type === "number" && typeof encoding === "boolean"){
-			append = encoding;
-			encoding = null;
-		}else if (type === "string"){
-			append = encoding;
-			encoding = bufferSize;
-			bufferSize = BUFFER_SIZE;
-		}else{
-			append = false;
-		}
-	}
+	settings = settings || {};
 	
-	if (bufferSize < 1) throw INVALID_BUFFER_SIZE;
-	
+	if (settings.bufferSize === 0) settings.bufferSize = -1;
 	this._settings = {
-		encoding: encoding,
-		bufferSize: bufferSize,
-		append: append ? "a" : "w"
+		bufferSize: settings.bufferSize || BUFFER_SIZE,
+		encoding: settings.encoding || null,
+		append: settings.append ? "a" : "w"
 	};
+	
+	if (this._settings.bufferSize < 1) throw INVALID_BUFFER_SIZE;
 	
 	this._fileName = fileName;
 	this._stream = null;
@@ -72,7 +41,7 @@ BufferedWriter.prototype = Object.create (EVENTS.EventEmitter.prototype);
 BufferedWriter.prototype.constructor = BufferedWriter;
 
 BufferedWriter.prototype._flush = function (){
-	this._stream.write (this._bufferOffset !== this._settings._bufferSize ?
+	this._stream.write (this._bufferOffset !== this._settings.bufferSize ?
 		this._buffer.slice (0, this._bufferOffset) : this._buffer);
 	this._bufferOffset = 0;
 };
@@ -110,14 +79,18 @@ BufferedWriter.prototype._write = function (data, offset, length){
 	}
 };
 
-BufferedWriter.prototype.close = function (){
+BufferedWriter.prototype.close = function (cb){
 	if (!this._stream) return;
 
 	if (this._bufferOffset !== 0){
 		this._flush ();
 	}
 	
-	this._stream.end ();
+	var me = this;
+	this._stream.on ("close", function (){
+		if (cb) cb.call (this);
+	});
+	this._stream.destroySoon ();
 	this._stream = null;
 	this._buffer = null;
 };
