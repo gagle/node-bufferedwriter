@@ -5,7 +5,7 @@
  * @author Gabriel Llamas
  * @created 27/04/2012
  * @modified 04/05/2012
- * @version 0.1.5
+ * @version 0.1.6
  */
 "use strict";
 
@@ -55,29 +55,28 @@ BufferedWriter.prototype._canWrite = function (n){
 
 BufferedWriter.prototype._write = function (data, offset, length){
 	var me = this;
-	this._buffer = new Buffer (this._settings.bufferSize);
-	this._stream = FS.createWriteStream (this._fileName, {
-		flags: me._settings.append
-	});
-	this._stream.on ("error", function (error){
-		me.emit (error);
-	});
 	
-	BufferedWriter.prototype._write = function (data, offset, length){
-		var bytes = this._canWrite (length);
-		data.copy (this._buffer, this._bufferOffset, offset, offset + bytes);
-		this._bufferOffset += bytes;
-		offset += bytes;
-		length -= bytes;
-		if (this._bufferOffset === this._settings.bufferSize){
-			this._flush ();
-			if (length !== 0){
-				this._write (data, offset, length);
-			}
+	if (!this._stream){
+		this._buffer = new Buffer (this._settings.bufferSize);
+		this._stream = FS.createWriteStream (this._fileName, {
+			flags: me._settings.append
+		});
+		this._stream.on ("error", function (error){
+			me.emit (error);
+		});
+	}
+	
+	var bytes = this._canWrite (length);
+	data.copy (this._buffer, this._bufferOffset, offset, offset + bytes);
+	this._bufferOffset += bytes;
+	offset += bytes;
+	length -= bytes;
+	if (this._bufferOffset === this._settings.bufferSize){
+		this._flush ();
+		if (length !== 0){
+			this._write (data, offset, length);
 		}
-	};
-	
-	this._write (data, offset, length);
+	}
 };
 
 BufferedWriter.prototype.close = function (cb){
