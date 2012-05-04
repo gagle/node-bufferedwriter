@@ -4,8 +4,8 @@
  *
  * @author Gabriel Llamas
  * @created 27/04/2012
- * @modified 02/05/2012
- * @version 0.1.4
+ * @modified 04/05/2012
+ * @version 0.1.5
  */
 "use strict";
 
@@ -41,12 +41,12 @@ BufferedWriter.prototype = Object.create (EVENTS.EventEmitter.prototype);
 BufferedWriter.prototype.constructor = BufferedWriter;
 
 BufferedWriter.prototype._flush = function (){
-	this._stream.write (this._bufferOffset !== this._settings.bufferSize ?
-		this._buffer.slice (0, this._bufferOffset) : this._buffer);
+	this._stream.write (new Buffer (this._bufferOffset !== this._settings.bufferSize ?
+		this._buffer.slice (0, this._bufferOffset) : this._buffer));
 	this._bufferOffset = 0;
 };
 
-BufferedWriter.prototype._getAvailableSpace = function (n){
+BufferedWriter.prototype._canWrite = function (n){
 	if (n + this._bufferOffset > this._settings.bufferSize){
 		n = this._settings.bufferSize - this._bufferOffset;
 	}
@@ -55,28 +55,29 @@ BufferedWriter.prototype._getAvailableSpace = function (n){
 
 BufferedWriter.prototype._write = function (data, offset, length){
 	var me = this;
-	if (!this._stream){
-		this._buffer = new Buffer (this._settings.bufferSize);
-		this._stream = FS.createWriteStream (this._fileName, {
-			flags: me._settings.append,
-			encoding: me._settings.encoding
-		});
-		this._stream.on ("error", function (error){
-			me.emit (error);
-		});
-	}
+	this._buffer = new Buffer (this._settings.bufferSize);
+	this._stream = FS.createWriteStream (this._fileName, {
+		flags: me._settings.append
+	});
+	this._stream.on ("error", function (error){
+		me.emit (error);
+	});
 	
-	var bytes = this._getAvailableSpace (length);
-	data.copy (this._buffer, this._bufferOffset, offset, offset + bytes);
-	this._bufferOffset += bytes;
-	offset += bytes;
-	length -= bytes;
-	if (this._bufferOffset === this._settings.bufferSize){
-		this._flush ();
-		if (length !== 0){
-			this._write (data, offset, length);
+	BufferedWriter.prototype._write = function (data, offset, length){
+		var bytes = this._canWrite (length);
+		data.copy (this._buffer, this._bufferOffset, offset, offset + bytes);
+		this._bufferOffset += bytes;
+		offset += bytes;
+		length -= bytes;
+		if (this._bufferOffset === this._settings.bufferSize){
+			this._flush ();
+			if (length !== 0){
+				this._write (data, offset, length);
+			}
 		}
-	}
+	};
+	
+	this._write (data, offset, length);
 };
 
 BufferedWriter.prototype.close = function (cb){
@@ -122,7 +123,7 @@ BufferedWriter.prototype.write = function (buffer, offset, length){
 		buffer = new Buffer (buffer);
 	}else if (type === "string"){
 		offset = 0;
-		length = buffer.length;
+		length = Buffer.byteLength (buffer, this._settings.encoding);
 		buffer = new Buffer (buffer, this._settings.encoding);
 	}else{
 		if (isArray (buffer)){
