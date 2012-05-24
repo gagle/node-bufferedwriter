@@ -4,8 +4,8 @@
  *
  * @author Gabriel Llamas
  * @created 27/04/2012
- * @modified 04/05/2012
- * @version 0.1.6
+ * @modified 24/05/2012
+ * @version 0.1.7
  */
 "use strict";
 
@@ -62,7 +62,7 @@ BufferedWriter.prototype._write = function (data, offset, length){
 			flags: me._settings.append
 		});
 		this._stream.on ("error", function (error){
-			me.emit (error);
+			me.emit ("error", error);
 		});
 	}
 	
