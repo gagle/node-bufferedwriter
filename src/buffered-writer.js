@@ -4,8 +4,8 @@
  *
  * @author Gabriel Llamas
  * @created 27/04/2012
- * @modified 24/05/2012
- * @version 0.1.7
+ * @modified 22/07/2012
+ * @version 0.1.8
  */
 "use strict";
 
@@ -65,6 +65,8 @@ BufferedWriter.prototype._write = function (data, offset, length){
 			me.emit ("error", error);
 		});
 	}
+	
+	if (length === 0) return;
 	
 	var bytes = this._canWrite (length);
 	data.copy (this._buffer, this._bufferOffset, offset, offset + bytes);
@@ -131,7 +133,7 @@ BufferedWriter.prototype.write = function (buffer, offset, length){
 		var argsLen = arguments.length;
 		if (argsLen === 1){
 			offset = 0;
-			length = 1;
+			length = buffer.length == 0 ? 0 : 1;
 		}
 	}
 	

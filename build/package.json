@@ -1,6 +1,6 @@
 {
 	"name": "buffered-writer",
-	"version": "0.1.7",
+	"version": "0.1.8",
 	"description": "Fully configurable buffered writer.",
 	"keywords": ["buffer", "writer", "line", "write line", "file", "write file", "write text file",
 		"write binary file", "binary"],
