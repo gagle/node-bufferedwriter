@@ -4,8 +4,8 @@
  *
  * @author Gabriel Llamas
  * @created 27/04/2012
- * @modified 22/07/2012
- * @version 0.1.8
+ * @modified 24/07/2012
+ * @version 0.1.9
  */
 "use strict";
 
@@ -16,6 +16,19 @@ var BUFFER_SIZE = 16384;
 var EOL = process.platform.indexOf ("win") !== -1 ? new Buffer ([0x0D, 0x0A]) : new Buffer ([0x0A]);
 
 var INVALID_BUFFER_SIZE = new Error ("The buffer size must be greater than 0.");
+
+var isArray = function (array){
+	return Object.prototype.toString.call (array) === "[object Array]";
+};
+
+var toHexArray = function (n){
+	var array = [];
+	do{
+		array.unshift (n & 0xFF);
+		n = n >>> 8;
+	}while (n);
+	return array;
+};
 
 var BufferedWriter = function (fileName, settings){
 	EVENTS.EventEmitter.call (this);
@@ -40,12 +53,6 @@ var BufferedWriter = function (fileName, settings){
 BufferedWriter.prototype = Object.create (EVENTS.EventEmitter.prototype);
 BufferedWriter.prototype.constructor = BufferedWriter;
 
-BufferedWriter.prototype._flush = function (){
-	this._stream.write (new Buffer (this._bufferOffset !== this._settings.bufferSize ?
-		this._buffer.slice (0, this._bufferOffset) : this._buffer));
-	this._bufferOffset = 0;
-};
-
 BufferedWriter.prototype._canWrite = function (n){
 	if (n + this._bufferOffset > this._settings.bufferSize){
 		n = this._settings.bufferSize - this._bufferOffset;
@@ -53,18 +60,20 @@ BufferedWriter.prototype._canWrite = function (n){
 	return n;
 };
 
+BufferedWriter.prototype._flush = function (){
+	this._stream.write (new Buffer (this._bufferOffset !== this._settings.bufferSize ?
+		this._buffer.slice (0, this._bufferOffset) : this._buffer));
+	this._bufferOffset = 0;
+};
+
 BufferedWriter.prototype._write = function (data, offset, length){
 	var me = this;
-	
-	if (!this._stream){
+
+	if (!this._buffer){
 		this._buffer = new Buffer (this._settings.bufferSize);
-		this._stream = FS.createWriteStream (this._fileName, {
-			flags: me._settings.append
-		});
-		this._stream.on ("error", function (error){
-			me.emit ("error", error);
-		});
 	}
+	
+	this.touch (me._settings.append);
 	
 	if (length === 0) return;
 	
@@ -94,6 +103,7 @@ BufferedWriter.prototype.close = function (cb){
 	});
 	this._stream.destroySoon ();
 	this._stream = null;
+	this._fd = null;
 	this._buffer = null;
 };
 
@@ -102,17 +112,20 @@ BufferedWriter.prototype.newLine = function (){
 	return this;
 };
 
-var isArray = function (array){
-	return Object.prototype.toString.call (array) === "[object Array]";
-};
-
-var toHexArray = function (n){
-	var array = [];
-	do{
-		array.unshift (n & 0xFF);
-		n = n >>> 8;
-	}while (n);
-	return array;
+BufferedWriter.prototype.touch = function (_append){
+	if (this._stream) return this;
+	_append = _append || "w";
+	
+	var me = this;
+	this._stream = FS.createWriteStream (this._fileName, {
+			flags: _append,
+			encoding: me._settings.encoding
+		})
+		.on ("error", function (error){
+			me.emit ("error", error);
+		});
+	
+	return this;
 };
 
 BufferedWriter.prototype.write = function (buffer, offset, length){
