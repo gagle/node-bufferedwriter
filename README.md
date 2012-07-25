@@ -38,5 +38,5 @@ Or simply copying `build/buffered-writer.js` into your project's directory and `
  
 [Reference](https://github.com/Gagle/Node-BufferedWriter/wiki/Reference)  
 [Examples](https://github.com/Gagle/Node-BufferedWriter/tree/master/examples)  
-[Change log](https://github.com/Gagle/Node-BufferedWriter/wiki/Change-log)  
+[Change Log](https://github.com/Gagle/Node-BufferedWriter/wiki/Change-Log)  
 [MIT License](https://github.com/Gagle/Node-BufferedWriter/blob/master/LICENSE)
