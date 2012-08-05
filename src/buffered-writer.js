@@ -4,22 +4,21 @@
  *
  * @author Gabriel Llamas
  * @created 27/04/2012
- * @modified 24/07/2012
- * @version 0.1.9
+ * @modified 05/08/2012
+ * @version 0.1.10
  */
 "use strict";
 
 var EVENTS = require ("events");
 var FS = require ("fs");
 
+var Error = require ("errno-codes");
+
+Error.create ("INVALID_BUFFER_SIZE", Error.getNextAvailableErrorCode (),
+		"The buffer size must be greater than 0.");
+
 var BUFFER_SIZE = 16384;
 var EOL = process.platform.indexOf ("win") !== -1 ? new Buffer ([0x0D, 0x0A]) : new Buffer ([0x0A]);
-
-var INVALID_BUFFER_SIZE = new Error ("The buffer size must be greater than 0.");
-
-var isArray = function (array){
-	return Object.prototype.toString.call (array) === "[object Array]";
-};
 
 var toHexArray = function (n){
 	var array = [];
@@ -42,7 +41,7 @@ var BufferedWriter = function (fileName, settings){
 		append: settings.append ? "a" : "w"
 	};
 	
-	if (this._settings.bufferSize < 1) throw INVALID_BUFFER_SIZE;
+	if (this._settings.bufferSize < 1) throw Error.get (Error.INVALID_BUFFER_SIZE);
 	
 	this._fileName = fileName;
 	this._stream = null;
@@ -140,7 +139,7 @@ BufferedWriter.prototype.write = function (buffer, offset, length){
 		length = Buffer.byteLength (buffer, this._settings.encoding);
 		buffer = new Buffer (buffer, this._settings.encoding);
 	}else{
-		if (isArray (buffer)){
+		if (Array.isArray (buffer)){
 			buffer = new Buffer (buffer);
 		}
 		var argsLen = arguments.length;
