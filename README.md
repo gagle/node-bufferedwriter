@@ -41,8 +41,6 @@ Via npm:
 npm install buffered-writer
 ```
 
-Or simply copying `build/buffered-writer.js` into your project's directory and `require()` accordingly.
-
 ***
 
 <a name="compatibility"></a>
