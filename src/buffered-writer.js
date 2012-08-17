@@ -4,8 +4,8 @@
  *
  * @author Gabriel Llamas
  * @created 27/04/2012
- * @modified 05/08/2012
- * @version 0.1.10
+ * @modified 17/08/2012
+ * @version 0.1.11
  */
 "use strict";
 
@@ -14,7 +14,7 @@ var FS = require ("fs");
 
 var Error = require ("errno-codes");
 
-Error.create ("INVALID_BUFFER_SIZE", Error.getNextAvailableErrorCode (),
+Error.create ("INVALID_BUFFER_SIZE", Error.getNextAvailableErrno (),
 		"The buffer size must be greater than 0.");
 
 var BUFFER_SIZE = 16384;
