@@ -14,7 +14,7 @@ var FS = require ("fs");
 
 var Error = require ("errno-codes");
 
-Error.create ("INVALID_BUFFER_SIZE", Error.getNextAvailableErrno (),
+Error.create (Error.getNextAvailableErrno (), "INVALID_BUFFER_SIZE", 
 		"The buffer size must be greater than 0.");
 
 var BUFFER_SIZE = 16384;
