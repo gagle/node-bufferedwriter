@@ -16,6 +16,6 @@ new BufferedWriter ("file")
 			
 			.touch () //Truncates the file to zero length, no matter if the settings are configured to append
 			.write ("test")
-			.touch ().touch () //No operation because the file is already open
+			.touch ().touch () //No operation because the file is already opened
 			.close (); //The file contains: "test"
 	});
