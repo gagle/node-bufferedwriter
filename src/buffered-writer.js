@@ -18,7 +18,7 @@ Error.create (Error.getNextAvailableErrno (), "INVALID_BUFFER_SIZE",
 		"The buffer size must be greater than 0.");
 
 var BUFFER_SIZE = 16384;
-var EOL = process.platform.indexOf ("win") !== -1 ? new Buffer ([0x0D, 0x0A]) : new Buffer ([0x0A]);
+var EOL = process.platform === "win32" ? new Buffer ([0x0D, 0x0A]) : new Buffer ([0x0A]);
 
 var toHexArray = function (n){
 	var array = [];
