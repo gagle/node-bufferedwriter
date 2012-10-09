@@ -3,7 +3,9 @@
 Node BufferedWriter
 ===================
 
-#### Fully configurable buffered writer for node.js ####
+_Node.js project_
+
+#### Fully configurable buffered writer ####
 
 [Show me!](#showme) | [Availability](#availability) | [Compatibility](#compatibility) | [Documentation](#documentation)
 

@@ -1,6 +1,6 @@
 /**
  * @name BufferedWriter.
- * @description Fully configurable buffered writer for node.js.
+ * @description Fully configurable buffered writer.
  *
  * @author Gabriel Llamas
  * @created 27/04/2012
