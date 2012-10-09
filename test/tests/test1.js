@@ -1,8 +1,8 @@
 var BufferedWriter = require ("../../build/buffered-writer");
-var BufferedReader = require ("buffered-reader");
+var BinaryReader = require ("buffered-reader").BinaryReader;
 
 var writeFile = function (file, cb){
-	new BufferedWriter (file, { encoding: "utf8" })
+	new BufferedWriter (file, { encoding: "utf8", bufferSize: 1 })
 		.on ("error", function (error){
 			cb (error);
 		})
@@ -16,8 +16,8 @@ var writeFile = function (file, cb){
 };
 
 var readFile = function (file, cb){
-	new BufferedReader (file, { encoding: "utf8" })
-		.readBytes (11, function (error, bytes, bytesRead){
+	new BinaryReader (file, { encoding: "utf8" })
+		.read (11, function (error, bytes, bytesRead){
 			if (error) return cb (error);
 			
 			console.log (bytes.toString ());

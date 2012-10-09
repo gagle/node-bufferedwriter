@@ -4,8 +4,8 @@
  *
  * @author Gabriel Llamas
  * @created 27/04/2012
- * @modified 17/08/2012
- * @version 0.1.11
+ * @modified 09/10/2012
+ * @version 0.1.12
  */
 "use strict";
 
@@ -46,23 +46,21 @@ var BufferedWriter = function (fileName, settings){
 	this._fileName = fileName;
 	this._stream = null;
 	this._buffer = null;
-	this._bufferOffset = 0;
+	//Marca la primera posicion libre del buffer donde escribir bytes
+	this._offset = 0;
+	this._closing = false;
 };
 
 BufferedWriter.prototype = Object.create (EVENTS.EventEmitter.prototype);
 BufferedWriter.prototype.constructor = BufferedWriter;
 
-BufferedWriter.prototype._canWrite = function (n){
-	if (n + this._bufferOffset > this._settings.bufferSize){
-		n = this._settings.bufferSize - this._bufferOffset;
-	}
-	return n;
-};
-
 BufferedWriter.prototype._flush = function (){
-	this._stream.write (new Buffer (this._bufferOffset !== this._settings.bufferSize ?
-		this._buffer.slice (0, this._bufferOffset) : this._buffer));
-	this._bufferOffset = 0;
+	//Cuando se escribe un buffer en el stream internamente no se crea una copia, solo se guarda
+	//la referencia, por lo que si el buffer se modifica desde fuera internamente tambien
+	//se habra modificado. Es por eso que se instancia un nuevo buffer para escribir datos.
+	this._stream.write (new Buffer (this._offset !== this._settings.bufferSize ?
+		this._buffer.slice (0, this._offset) : this._buffer));
+	this._offset = 0;
 };
 
 BufferedWriter.prototype._write = function (data, offset, length){
@@ -76,34 +74,40 @@ BufferedWriter.prototype._write = function (data, offset, length){
 	
 	if (length === 0) return;
 	
-	var bytes = this._canWrite (length);
-	data.copy (this._buffer, this._bufferOffset, offset, offset + bytes);
-	this._bufferOffset += bytes;
+	var bytes = length + this._offset > this._settings.bufferSize ?
+			this._settings.bufferSize - this._offset :
+			length;
+	
+	data.copy (this._buffer, this._offset, offset, offset + bytes);
+	this._offset += bytes;
 	offset += bytes;
 	length -= bytes;
-	if (this._bufferOffset === this._settings.bufferSize){
+	if (this._offset === this._settings.bufferSize){
 		this._flush ();
 		if (length !== 0){
+			//Mientras queden bytes por escribir en el buffer se van haciendo llamadas recursivas
 			this._write (data, offset, length);
 		}
 	}
 };
 
 BufferedWriter.prototype.close = function (cb){
-	if (!this._stream) return;
+	if (this._closing || !this._stream) return;
+	if (cb) cb = cb.bind (this);
 
-	if (this._bufferOffset !== 0){
+	if (this._offset !== 0){
 		this._flush ();
 	}
 	
 	var me = this;
 	this._stream.on ("close", function (){
-		if (cb) cb.call (this);
+		me._stream = null;
+		me._buffer = null;
+		me._closing = false;
+		if (cb) cb ();
 	});
 	this._stream.destroySoon ();
-	this._stream = null;
-	this._fd = null;
-	this._buffer = null;
+	this._closing = true;
 };
 
 BufferedWriter.prototype.newLine = function (){
@@ -112,7 +116,7 @@ BufferedWriter.prototype.newLine = function (){
 };
 
 BufferedWriter.prototype.touch = function (_append){
-	if (this._stream) return this;
+	if (this._closing) return this;
 	_append = _append || "w";
 	
 	var me = this;
@@ -128,6 +132,8 @@ BufferedWriter.prototype.touch = function (_append){
 };
 
 BufferedWriter.prototype.write = function (buffer, offset, length){
+	if (this._closing) return this;
+	
 	var type = typeof buffer;
 	if (type === "number"){
 		offset = 0;
@@ -145,7 +151,7 @@ BufferedWriter.prototype.write = function (buffer, offset, length){
 		var argsLen = arguments.length;
 		if (argsLen === 1){
 			offset = 0;
-			length = buffer.length == 0 ? 0 : 1;
+			length = buffer.length === 0 ? 0 : 1;
 		}
 	}
 	
