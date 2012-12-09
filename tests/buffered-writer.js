@@ -300,7 +300,7 @@ describe ("buffered-writer", function (){
 		
 		it ("should apply offset and length (length not set, String)",
 				function (done){
-			bw.open ("file").write ("asd", 1)
+			bw.open ("file").write ("↑sd", 1)
 					.close (function (){
 				FS.readFile ("file", function (error, data){
 					if (error) return done (error);
