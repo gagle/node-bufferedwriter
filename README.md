@@ -7,9 +7,7 @@ _Node.js project_
 
 Version: 0.2.0
 
-When you need to write a file you typically write the content in little chunks at a time. To avoid multiple calls to the underlying I/O layer you need to use a piece of memory called "buffer", so instead of writting directly to the disk, you write to the buffer and when it is filled the content is written to disk. Doing this you win performance.
-
-This library allows you to write files using internal buffers, so you don't have to worry about them.
+Node.js streams are not buffered, that is, when you write data to it you're doing an I/O call. This module buffers the data that has to be written to disk and eases the buffer manipulation when you need to write data from different nature (strings, numbers, arrays or buffers).
 
 #### Installation ####
 
