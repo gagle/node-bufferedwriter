@@ -1,4 +1,7 @@
-v0.2.0 (xx Dec 2012)
+v0.2.1 (09 Dec 2012)
+	An INVALID_DATA error is emitted if the data to write is invalid.
+
+v0.2.0 (09 Dec 2012)
 	Complete code revision and refactor.
 	Removed "touch()".
 	Added "open()".

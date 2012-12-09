@@ -327,10 +327,33 @@ describe ("buffered-writer", function (){
 					var out = bw.open ("file");
 					//Hack
 					out._error = function (error){
-						ASSERT.ok (error.code, "INVALID_OFFSET_LENGTH");
+						ASSERT.equal (error.code, "INVALID_OFFSET_LENGTH");
 						done ();
 					};
 					out.write ("asd", 5, -1);
+				});
+		
+		it ("should emit an INVALID_DATA error if the data is not a Number, " +
+				"String, Array or Buffer",
+				function (done){
+			var out = bw.open ("file");
+			out.on ("error", function (error){
+				ASSERT.equal (error.code, "INVALID_DATA");
+				ASSERT.ok (out._closed);
+				done ();
+			}).write (function (){});
+		});
+		
+		it ("should throw an INVALID_DATA exception if the data is not a " +
+				"Number, String, Array or Buffer and there's no error listener",
+				function (done){
+					var out = bw.open ("file");
+					//Hack
+					out._error = function (error){
+						ASSERT.equal (error.code, "INVALID_DATA");
+						done ();
+					};
+					out.write (function (){});
 				});
 		
 		it ("should write data from multiple nature", function (done){
@@ -338,7 +361,7 @@ describe ("buffered-writer", function (){
 					.write ([0x00, 0x01, 0x02])
 					.write (new Buffer ([0x03, 0x04]), 1, 1)
 					.write (0x0506)
-					.write ("a↑b", 1)
+					.write ("↑a", 1)
 					.close (function (){
 						FS.readFile ("file", function (error, data){
 							if (error) return done (error);
@@ -349,9 +372,9 @@ describe ("buffered-writer", function (){
 								data[3] === 0x04 &&
 								data[4] === 0x05 &&
 								data[5] === 0x06 &&
-								data[6] === 0xe2 &&
-								data[7] === 0x86 &&
-								data[8] === 0x91
+								data[6] === 0x86 &&
+								data[7] === 0x91 &&
+								data[8] === 0x61
 							);
 							done ();
 						});

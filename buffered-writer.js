@@ -11,6 +11,8 @@ errno.create (errno.getNextAvailableErrno (), "STREAM_CLOSED",
 errno.create (errno.getNextAvailableErrno (), "INVALID_OFFSET_LENGTH", 
 		"The offset or length parameters are not valid (offset={offset}, " +
 		"length={length}, length-offset<0).");
+errno.create (errno.getNextAvailableErrno (), "INVALID_DATA", 
+		"The data can only be a Number, String, Array or Buffer");
 
 var BUFFER_SIZE = 16384;
 var EOL = process.platform === "win32"
@@ -138,9 +140,14 @@ Writer.prototype.write = function (buffer, offset, length){
 	}else if (Array.isArray (buffer)){
 		buffer = new Buffer (buffer);
 		length = length || buffer.length - offset;
-	}else{
-		//Buffer
+	}else if (Buffer.isBuffer (buffer)){
 		length = length || buffer.length - offset;
+	}else{
+		var me = this;
+		this.close (function (){
+			me._error (errno.get ("INVALID_DATA"));
+		});
+		return;
 	}
 	
 	if (length < 0){

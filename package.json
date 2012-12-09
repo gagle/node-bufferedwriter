@@ -1,7 +1,7 @@
 {
 	"name": "buffered-writer",
-	"version": "0.2.0",
-	"description": "Writes buffered data",
+	"version": "0.2.1",
+	"description": "Writes buffered data to files",
 	"keywords": ["buffer", "write", "stream", "file", "binary", "data"],
 	"author": {
 		"name": "Gabriel Llamas",
