@@ -1,61 +1,38 @@
-<a name="start"></a>
-
-Node BufferedWriter
-===================
+buffered-writer
+===============
 
 _Node.js project_
 
-#### Fully configurable buffered writer ####
+#### Writes buffered data ####
 
-[Show me!](#showme) | [Availability](#availability) | [Compatibility](#compatibility) | [Documentation](#documentation)
-
-Version: 0.1.12
+Version: 0.2.0
 
 When you need to write a file you typically write the content in little chunks at a time. To avoid multiple calls to the underlying I/O layer you need to use a piece of memory called "buffer", so instead of writting directly to the disk, you write to the buffer and when it is filled the content is written to disk. Doing this you win performance.
 
 This library allows you to write files using internal buffers, so you don't have to worry about them.
 
-<a name="showme"></a>
-#### Show me! [↑](#start) ####
-
-```javascript
-var BufferedWriter = require ("buffered-writer");
-
-new BufferedWriter ("file")
-	.on ("error", function (error){
-		console.log (error);
-	})
-	
-	.write ([0x00, 0x01, 0x02], 0, 3) //Writes 0x00, 0x01, 0x02
-	.write (new Buffer ([0x03, 0x04]), 1, 1) //Writes 0x04
-	.write (0x0506) //Writes 0x05, 0x06
-	.close ();
-```
-
-***
-
-<a name="availability"></a>
-#### Availability [↑](#start) ####
-
-Via npm:
+#### Installation ####
 
 ```
 npm install buffered-writer
 ```
 
-***
+#### Example ####
 
-<a name="compatibility"></a>
-#### Compatibility [↑](#start) ####
+```javascript
+var bw = require ("buffered-writer");
 
-✔ Node 0.4.10+
+bw.open ("file")
+	.on ("error", function (error){
+		console.log (error);
+	})
+	.write ([0x00, 0x01, 0x02]) //Writes: 0x00, 0x01, 0x02
+	.write (new Buffer ([0x03, 0x04]), 1, 1) //Writes: 0x04
+	.write (0x0506) //Writes: 0x05, 0x06
+	.write ("a↑b", 1) //Writes: ↑ (0xe2, 0x86, 0x91)
+	.close ();
+```
 
-***
+#### Methods ####
 
-<a name="documentation"></a>
-#### Documentation [↑](#start) ####
- 
-[Reference](https://github.com/Gagle/Node-BufferedWriter/wiki/Reference)  
-[Examples](https://github.com/Gagle/Node-BufferedWriter/tree/master/examples)  
-[Change Log](https://github.com/Gagle/Node-BufferedWriter/wiki/Change-Log)  
-[MIT License](https://github.com/Gagle/Node-BufferedWriter/blob/master/LICENSE)
+todo

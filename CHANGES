@@ -1,0 +1,51 @@
+v0.2.0 (xx Dec 2012)
+	Complete code revision and refactor.
+	Removed "touch()".
+	Added "open()".
+	Minor improvements.
+
+v0.1.12 (09 Oct 2012)
+	Minor bugfixes.
+
+v0.1.11 (17 Aug 2012)
+	Updated errno-codes module.
+
+v0.1.10 (05 Aug 2012)
+	Better error management.
+
+v0.1.9 (24 Jul 2012)
+	Added touch() function.
+
+v0.1.8 (22 Jul 2012)
+	Improved code when the data to write had a length of 0.
+
+v0.1.7 (24 May 2012)
+	Fixed "error" event. Now is correctly emitted.
+
+v0.1.6 (04 May 2012)
+	Wow... Fixed noob error.
+
+v0.1.5 (04 May 2012)
+	Fixed bug when the data length exceeds the buffer size.
+	Fixed bug with utf8 encoding.
+
+v0.1.4 (02 May 2012)
+	Now the constructor receives an object in literal notation for the settings.
+	The "close()" function now receives a callback for being notified when the
+		data has been flushed to the kernel and it's safe to read it back.
+
+v0.1.3 (30 Apr 2012)
+	Improved number to hex array function.
+
+v0.1.2 (29 Apr 2012)
+	Now it's possible to write more than one byte passing a number, eg.:
+		"write(0x1234)" will write 0x12, 0x34.
+
+v0.1.1 (28 Apr 2012)
+	Fixed parameters in "write()" function.
+
+v0.1.0 (28 Apr 2012)
+	No more callbacks. The buffer is flushed using a WriteStream.
+
+v0.0.1 (28 Apr 2012)
+	First commit.

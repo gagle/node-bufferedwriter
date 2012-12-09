@@ -1,0 +1,25 @@
+{
+	"name": "buffered-writer",
+	"version": "0.2.0",
+	"description": "Writes buffered data",
+	"keywords": ["buffer", "write", "stream", "file", "binary", "data"],
+	"author": {
+		"name": "Gabriel Llamas",
+		"email": "gaglekas@gmail.com"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/Gagle/Node-BufferedWriter.git"
+	},
+	"engines": {
+		"node": "*"
+	},
+	"dependencies": {
+		"errno-codes": "*"
+	},
+	"licenses": [{
+		"type": "MIT",
+		"url": "http://www.opensource.org/licenses/mit-license.html"
+	}],
+	"main": "buffered-writer"
+}
