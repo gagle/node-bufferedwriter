@@ -129,13 +129,18 @@ Writer.prototype.write = function (buffer, offset, length){
 	}
 	
 	offset = offset || 0;
+	var stringError;
+	
 	var type = typeof buffer;
 	if (type === "number"){
 		buffer = toHexArray (buffer);
 		length = length || buffer.length - offset;
 		buffer = new Buffer (buffer);
 	}else if (type === "string"){
-		length = length || Buffer.byteLength (buffer, this._encoding) - offset;
+		stringError = length - offset < 0;
+		buffer = buffer.substr (offset, length);
+		offset = 0;
+		length = Buffer.byteLength (buffer, this._encoding);
 		buffer = new Buffer (buffer, this._encoding);
 	}else if (Array.isArray (buffer)){
 		buffer = new Buffer (buffer);
@@ -150,7 +155,7 @@ Writer.prototype.write = function (buffer, offset, length){
 		return;
 	}
 	
-	if (length < 0){
+	if (stringError || length < 0){
 		var me = this;
 		this.close (function (){
 			me._error (errno.get ("INVALID_OFFSET_LENGTH", {

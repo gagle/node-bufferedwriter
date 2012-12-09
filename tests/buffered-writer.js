@@ -372,9 +372,7 @@ describe ("buffered-writer", function (){
 								data[3] === 0x04 &&
 								data[4] === 0x05 &&
 								data[5] === 0x06 &&
-								data[6] === 0x86 &&
-								data[7] === 0x91 &&
-								data[8] === 0x61
+								data[6] === 0x61
 							);
 							done ();
 						});
