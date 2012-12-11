@@ -33,7 +33,7 @@ bw.open ("file")
 
 #### Methods ####
 
-When you call to `open()` a stream a `Writer` instance is returned. This object inherits from `EventEmitter` and wraps a `WriteStream`. Only an `error` event is emitted. When this ocurrs, the `Writer` is closed automatically, you don't need to close it explicitly (if you try to do so you'll get another error, you cannot close twice).
+When you call to `open()` a `Writer` instance is returned. This object inherits from `EventEmitter` and wraps a `WriteStream`. Only an `error` event is emitted. When this ocurrs, the `Writer` is closed automatically, you don't need to close it explicitly (if you try to do so you'll get another error, you cannot close twice).
 
 - [bw.open(file[, settings])](#open)
 - [Writer#close([callback])](#close)
@@ -48,6 +48,8 @@ Creates a `Writer` and opens a stream to the given file. If the file doesn't exi
 - bufferSize. _Number_. The buffer size. It must be greater than 0. Default is 16KB.
 - encoding. _String_. The file encoding. Is only used when strings are written, that is, this parameter is ignored when arrays, numbers and buffers are written. Default is "utf8". Possible values are: "ascii", "utf8", "utf16le", "ucs2", "base64", "hex".
 - append. _Boolean_. If true appends the date, if false the file is truncated. Default is false.
+- mode. _Number_ | _String_. The file attributes. Default is 0644.
+- start. _Number_. The offset to start writing data. Default is 0.
 
 Returns the new `Writer` instance.
 
