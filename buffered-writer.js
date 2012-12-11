@@ -2,16 +2,16 @@
 
 var EVENTS = require ("events");
 var FS = require ("fs");
-var errno = require ("errno-codes");
+var ep = require ("error-provider");
 
-errno.create (errno.getNextAvailableErrno (), "INVALID_BUFFER_SIZE", 
+ep.create (ep.next (), "INVALID_BUFFER_SIZE", 
 		"The buffer size must be greater than 0.");
-errno.create (errno.getNextAvailableErrno (), "STREAM_CLOSED", 
+ep.create (ep.next (), "STREAM_CLOSED", 
 		"The stream is already closed, cannot write nor close it again.");
-errno.create (errno.getNextAvailableErrno (), "INVALID_OFFSET_LENGTH", 
+ep.create (ep.next (), "INVALID_OFFSET_LENGTH", 
 		"The offset or length parameters are not valid (offset={offset}, " +
 		"length={length}, length-offset<0).");
-errno.create (errno.getNextAvailableErrno (), "INVALID_DATA", 
+ep.create (ep.next (), "INVALID_DATA", 
 		"The data can only be a Number, String, Array or Buffer");
 
 var BUFFER_SIZE = 16384;
@@ -27,7 +27,7 @@ bw.open = function (file, args){
 	
 	if (args.bufferSize === 0) args.bufferSize = -1;
 	args.bufferSize = args.bufferSize || BUFFER_SIZE;
-	if (args.bufferSize < 1) throw errno.get ("INVALID_BUFFER_SIZE");
+	if (args.bufferSize < 1) throw ep.get ("INVALID_BUFFER_SIZE");
 	
 	return new Writer (file, args);
 };
@@ -103,7 +103,7 @@ Writer.prototype._write = function (data, offset, length){
 
 Writer.prototype.close = function (cb){
 	if (this._closed){
-		return this._error (errno.get ("STREAM_CLOSED"));
+		return this._error (ep.get ("STREAM_CLOSED"));
 	}
 
 	if (this._offset){
@@ -129,7 +129,7 @@ Writer.prototype.flush = function (cb){
 
 Writer.prototype.line = function (){
 	if (this._closed){
-		return this._error (errno.get ("STREAM_CLOSED"));
+		return this._error (ep.get ("STREAM_CLOSED"));
 	}
 	this._write (EOL, 0, EOL.length);
 	return this;
@@ -146,7 +146,7 @@ var toHexArray = function (n){
 
 Writer.prototype.write = function (buffer, offset, length){
 	if (this._closed){
-		return this._error (errno.get ("STREAM_CLOSED"));
+		return this._error (ep.get ("STREAM_CLOSED"));
 	}
 	
 	offset = offset || 0;
@@ -171,7 +171,7 @@ Writer.prototype.write = function (buffer, offset, length){
 	}else{
 		var me = this;
 		this.close (function (){
-			me._error (errno.get ("INVALID_DATA"));
+			me._error (ep.get ("INVALID_DATA"));
 		});
 		return;
 	}
@@ -179,7 +179,7 @@ Writer.prototype.write = function (buffer, offset, length){
 	if (stringError || length < 0){
 		var me = this;
 		this.close (function (){
-			me._error (errno.get ("INVALID_OFFSET_LENGTH", {
+			me._error (ep.get ("INVALID_OFFSET_LENGTH", {
 				offset: offset,
 				length: length
 			}));

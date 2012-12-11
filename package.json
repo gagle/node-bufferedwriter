@@ -1,6 +1,6 @@
 {
 	"name": "buffered-writer",
-	"version": "0.2.2",
+	"version": "0.2.3",
 	"description": "Writes buffered data to files",
 	"keywords": ["buffer", "write", "stream", "file", "binary", "data"],
 	"author": {
@@ -15,7 +15,7 @@
 		"node": "*"
 	},
 	"dependencies": {
-		"errno-codes": "*"
+		"error-provider": "*"
 	},
 	"licenses": [{
 		"type": "MIT",

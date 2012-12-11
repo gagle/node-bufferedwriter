@@ -5,7 +5,7 @@ _Node.js project_
 
 #### Writes buffered data ####
 
-Version: 0.2.2
+Version: 0.2.3
 
 Node.js streams are not buffered, that is, when you write data to them you're doing multiple I/O calls. This module buffers the data that has to be written to disk and eases the buffer manipulation when you need to write data from different nature (strings, numbers, arrays or buffers).
 
