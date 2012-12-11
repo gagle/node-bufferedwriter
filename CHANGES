@@ -1,5 +1,5 @@
 v0.2.3 (11 Dec 2012)
-	Replaces "errno-codes" dependency by "error-provider".
+	Replaced "errno-codes" dependency by "error-provider".
 
 v0.2.2 (11 Dec 2012)
 	Added "mode" and "start" to the "open()" parameters.
