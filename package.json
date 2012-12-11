@@ -1,6 +1,6 @@
 {
 	"name": "buffered-writer",
-	"version": "0.2.1",
+	"version": "0.2.2",
 	"description": "Writes buffered data to files",
 	"keywords": ["buffer", "write", "stream", "file", "binary", "data"],
 	"author": {

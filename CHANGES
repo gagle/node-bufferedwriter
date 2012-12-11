@@ -1,3 +1,8 @@
+v0.2.2 (10 Dec 2012)
+	Added "mode" and "start" to the "open()" parameters.
+	Added "writeln()".
+	Added "flush()".
+
 v0.2.1 (09 Dec 2012)
 	An INVALID_DATA error is emitted if the data to write is invalid.
 

@@ -36,6 +36,36 @@ describe ("buffered-writer", function (){
 		});
 	});
 	
+	describe ("flush", function (){
+		it ("should flush the buffered data to the disk", function (done){
+			var out = bw.open ("file").write ("a");
+			out.flush (function (){
+				FS.readFile ("file", function (error, data){
+					if (error) return done (error);
+					out.close ();
+					ASSERT.equal (data.toString (), "a");
+					done ();
+				});
+			});
+		});
+		
+		it ("shouldn't flush if there's no buffered data", function (done){
+			var out = bw.open ("file");
+			//Hack
+			out._flush = function (){
+				ASSERT.fail ();
+			};
+			out.flush (function (){
+				out.close ();
+				done ();
+			});
+		});
+		
+		afterEach (function (done){
+			FS.unlink ("file", done);
+		});
+	});
+	
 	describe ("line", function (){
 		it ("should emit a STREAM_CLOSED error if a line() has been executed " +
 				"after closing the stream", function (done){
@@ -300,8 +330,7 @@ describe ("buffered-writer", function (){
 		
 		it ("should apply offset and length (length not set, String)",
 				function (done){
-			bw.open ("file").write ("↑sd", 1)
-					.close (function (){
+			bw.open ("file").write ("↑sd", 1).close (function (){
 				FS.readFile ("file", function (error, data){
 					if (error) return done (error);
 					ASSERT.ok (data[0] === 115 && data[1] === 100);
@@ -380,6 +409,28 @@ describe ("buffered-writer", function (){
 		});
 		
 		afterEach (function (done){
+			FS.unlink ("file", done);
+		});
+	});
+	
+	describe ("writeln", function (){
+		it ("should write an EOL after the given data (the data is stringified)",
+				function (done){
+			bw.open ("file").writeln ("a").close (function (){
+				FS.readFile ("file", function (error, data){
+					if (error) return done (error);
+					ASSERT.ok (data[0] === 0x61);
+					if (WIN){
+						ASSERT.ok (data[1] === 0x0d && data[2] === 0x0a);
+					}else{
+						ASSERT.ok (data[1] === 0x0a);
+					}
+					done ();
+				});
+			});
+		});
+	
+		after (function (done){
 			FS.unlink ("file", done);
 		});
 	});

@@ -18,6 +18,7 @@ var BUFFER_SIZE = 16384;
 var EOL = process.platform === "win32"
 		? new Buffer ([0x0d, 0x0a])
 		: new Buffer ([0x0a]);
+var strEOL = EOL.toString ();
 
 var bw = module.exports = {};
 
@@ -39,13 +40,21 @@ var Writer = function (file, args){
 	this._buffer = null;
 	this._offset = 0;
 	this._closed = false;
+	this._flushCallback;
 	
 	var me = this;
 	this._stream = FS.createWriteStream (file, {
 		flags: args.append ? "a" : "w",
-		encoding: args.encoding
+		encoding: args.encoding,
+		mode: args.mode,
+		start: args.start
 	}).on ("error", function (error){
 		me.emit ("error", error);
+	}).on ("drain", function (){
+		if (me._flushCallback){
+			me._flushCallback ();
+			me._flushCallback = null;
+		}
 	});
 };
 
@@ -61,9 +70,12 @@ Writer.prototype._error = function (error){
 };
 
 Writer.prototype._flush = function (){
-	this._stream.write (new Buffer (this._offset !== this._bufferSize ?
-		this._buffer.slice (0, this._offset) : this._buffer));
+	var written = this._stream.write (
+			new Buffer (this._offset !== this._bufferSize
+					? this._buffer.slice (0, this._offset)
+					: this._buffer));
 	this._offset = 0;
+	return written;
 };
 
 Writer.prototype._write = function (data, offset, length){
@@ -102,8 +114,17 @@ Writer.prototype.close = function (cb){
 	this._stream.on ("close", function (){
 		if (cb) cb ();
 	});
-	this._stream.destroySoon ();
+	this._stream.end ();
 	this._closed = true;
+};
+
+Writer.prototype.flush = function (cb){
+	if (this._offset === 0) return cb ();
+	if (!this._flush ()){
+		this._flushCallback = cb;
+	}else{
+		cb ();
+	}
 };
 
 Writer.prototype.line = function (){
@@ -170,4 +191,8 @@ Writer.prototype.write = function (buffer, offset, length){
 		this._write (buffer, offset, length);
 	}
 	return this;
+};
+
+Writer.prototype.writeln = function (buffer, offset, length){
+	return this.write (buffer + strEOL, offset, length);
 };
