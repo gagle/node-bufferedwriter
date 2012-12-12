@@ -40,7 +40,6 @@ var Writer = function (file, args){
 	this._buffer = null;
 	this._offset = 0;
 	this._closed = false;
-	this._flushCallback;
 	
 	var me = this;
 	this._stream = FS.createWriteStream (file, {

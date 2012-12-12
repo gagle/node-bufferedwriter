@@ -47,7 +47,7 @@ Creates a `Writer` and opens a stream to the given file. If the file doesn't exi
 
 - bufferSize. _Number_. The buffer size. It must be greater than 0. Default is 16KB.
 - encoding. _String_. The file encoding. Is only used when strings are written, that is, this parameter is ignored when arrays, numbers and buffers are written. Default is "utf8". Possible values are: "ascii", "utf8", "utf16le", "ucs2", "base64", "hex".
-- append. _Boolean_. If true appends the date, if false the file is truncated. Default is false.
+- append. _Boolean_. If true appends the data, if false the file is truncated. Default is false.
 - mode. _Number_ | _String_. The file attributes. Default is 0644.
 - start. _Number_. The offset to start writing data. Default is 0.
 
