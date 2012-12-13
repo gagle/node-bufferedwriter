@@ -79,10 +79,10 @@ The data can be a Number, String, Array or Buffer.
 - Array. An array of numbers. They are stored in the same order.
 - Buffer. The Node.js built-in Buffer.
 
+The offset and length specifies the slice of the given piece of data that will be written. By default offset is 0 and length is the last byte/character. The offset and length are applied to the string characters, not the bytes, for example, `write("↑a", 1)` will write `a` because offset is 1. Take into account that `↑` is encoded with 3 bytes in utf8.
+
 Returns the `Writer` instance for chaining methods.
 
 <a name="writeln"></a>
 __Writer#writeln(data[, offset[, length]])__  
 Does the same as `write()` but stringifies the data and concatenates an EOL, OS dependent, `\r\n` on Windows, `\n` otherwise.
-
-The offset and length specifies the slice of the given piece of data that will be written. By default offset is 0 and length is the last byte/character. The offset and length are applied to the string characters, not the bytes, for example, `write("↑a", 1)` will write `a` because offset is 1. Take into account that `↑` is encoded with 3 bytes in utf8.
