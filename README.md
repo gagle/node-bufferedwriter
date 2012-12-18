@@ -67,7 +67,7 @@ This function is typically used when you need to ensure that the data is flushed
 __Writer#line()__  
 Writes a line, OS dependent, `\r\n` on Windows, `\n` otherwise.
 
-Returns the `Writer` instance for chaining methods.
+Returns the `Writer` instance to allow method chaining.
 
 <a name="write"></a>
 __Writer#write(data[, offset[, length]])__  
@@ -81,7 +81,7 @@ The data can be a Number, String, Array or Buffer.
 
 The offset and length specifies the slice of the given piece of data that will be written. By default offset is 0 and length is the last byte/character. The offset and length are applied to the string characters, not the bytes, for example, `write("↑a", 1)` will write `a` because offset is 1. Take into account that `↑` is encoded with 3 bytes in utf8.
 
-Returns the `Writer` instance for chaining methods.
+Returns the `Writer` instance to allow method chaining.
 
 <a name="writeln"></a>
 __Writer#writeln(data[, offset[, length]])__  
