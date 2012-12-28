@@ -5,14 +5,14 @@ var FS = require ("fs");
 var ep = require ("error-provider");
 
 ep.create (ep.next (), "INVALID_BUFFER_SIZE", 
-		"The buffer size must be greater than 0.");
+		"The buffer size must be greater than 0");
 ep.create (ep.next (), "STREAM_CLOSED", 
-		"The stream is already closed, cannot write nor close it again.");
+		"The stream is already closed, cannot write nor close it again");
 ep.create (ep.next (), "INVALID_OFFSET_LENGTH", 
 		"The offset or length parameters are not valid (offset={offset}, " +
-		"length={length}, length-offset<0).");
+		"length={length}, length-offset<0)");
 ep.create (ep.next (), "INVALID_DATA", 
-		"The data can only be a Number, String, Array or Buffer.");
+		"The data can only be a Number, String, Array or Buffer");
 
 var BUFFER_SIZE = 16384;
 var EOL = process.platform === "win32"
