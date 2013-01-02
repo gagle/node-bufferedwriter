@@ -1,7 +1,7 @@
 "use strict";
 
-var EVENTS = require ("events");
-var FS = require ("fs");
+var events = require ("events");
+var fs = require ("fs");
 var ep = require ("error-provider");
 
 ep.create (ep.next (), "INVALID_BUFFER_SIZE", 
@@ -33,7 +33,7 @@ bw.open = function (file, args){
 };
 
 var Writer = function (file, args){
-	EVENTS.EventEmitter.call (this);
+	events.EventEmitter.call (this);
 	
 	this._bufferSize = args.bufferSize;
 	this._encoding = args.encoding;
@@ -42,7 +42,7 @@ var Writer = function (file, args){
 	this._closed = false;
 	
 	var me = this;
-	this._stream = FS.createWriteStream (file, {
+	this._stream = fs.createWriteStream (file, {
 		flags: args.append ? "a" : "w",
 		encoding: args.encoding,
 		mode: args.mode,
@@ -57,7 +57,7 @@ var Writer = function (file, args){
 	});
 };
 
-Writer.prototype = Object.create (EVENTS.EventEmitter.prototype);
+Writer.prototype = Object.create (events.EventEmitter.prototype);
 Writer.prototype.constructor = Writer;
 
 Writer.prototype._error = function (error){
