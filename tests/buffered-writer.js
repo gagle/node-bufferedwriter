@@ -2,7 +2,7 @@
 
 var ASSERT = require ("assert");
 var FS = require ("fs");
-var bw = require ("../buffered-writer");
+var bw = require ("../lib/buffered-writer");
 
 var WIN = process.platform === "win32";
 
