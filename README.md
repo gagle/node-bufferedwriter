@@ -69,7 +69,7 @@ var out = bw.open ("file").write ("a");
 //Default buffer size is 16KB so the "a" character is still in memory
 //Let's force and flush it to disk
 out.flush (function (){
-	FS.readFile ("file", function (error, data){
+	fs.readFile ("file", function (error, data){
 		if (error) return console.log (error);
 		//data.toString () === "a"
 		out.close ();
