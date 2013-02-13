@@ -37,6 +37,7 @@ When you call to `open()` a `Writer` instance is returned. This object inherits 
 
 - [bw.open(file[, settings])](#open)
 - [Writer#close([callback])](#close)
+- [Writer#flush(callback)](#flush)
 - [Writer#line()](#line)
 - [Writer#write(data[, offset[, length]])](#write)
 - [Writer#writeln(data[, offset[, length]])](#writeln)
@@ -62,6 +63,19 @@ __Writer#flush(callback)__
 Flushes the current data. After the callback is executed it's safe to read back the written data, the data has been stored successfully. The callback doesn't receive any parameter.
 
 This function is typically used when you need to ensure that the data is flushed to the disk at some point before closing the stream.
+
+```javascript
+var out = bw.open ("file").write ("a");
+//Default buffer size is 16KB so the "a" character is still in memory
+//Let's force and flush it to disk
+out.flush (function (){
+	FS.readFile ("file", function (error, data){
+		if (error) return console.log (error);
+		//data.toString () === "a"
+		out.close ();
+	});
+});
+```
 
 <a name="line"></a>
 __Writer#line()__  
